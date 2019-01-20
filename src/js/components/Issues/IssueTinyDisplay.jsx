@@ -19,7 +19,7 @@ export default class IssueTinyDisplay extends Component {
     issue: PropTypes.object,
     issueImageSize: PropTypes.string,
     issue_we_vote_id: PropTypes.string.isRequired,
-    overlayTriggerOnClickOnly: PropTypes.bool,
+    overlayTriggerOnClickOnly: PropTypes.bool, // unused
     popoverBottom: PropTypes.bool,
     toFollow: PropTypes.bool,
     urlWithoutHash: PropTypes.string,
@@ -30,18 +30,18 @@ export default class IssueTinyDisplay extends Component {
     this.popover_state = {};
     this.state = {
       issue_we_vote_id: "",
-      organizations_for_this_issue: [],
+      organizations_for_this_issue: [], // unused
     };
   }
 
   componentDidMount () {
     this.issueStoreListener = IssueStore.addListener(this.onIssueStoreChange.bind(this));
     this.voterGuideStoreListener = VoterGuideStore.addListener(this.onVoterGuideStoreChange.bind(this));
-    const voter_guides_for_this_issue = IssueStore.getVoterGuidesForOneIssue(this.props.issue_we_vote_id);
-    // console.log("IssueTinyDisplay, componentDidMount, voter_guides_for_this_issue: ", voter_guides_for_this_issue);
+    const voterGuidesForThisIssue = IssueStore.getVoterGuidesForOneIssue(this.props.issue_we_vote_id);
+    // console.log("IssueTinyDisplay, componentDidMount, voterGuidesForThisIssue: ", voterGuidesForThisIssue);
     this.setState({
       issue_we_vote_id: this.props.issue_we_vote_id,
-      voter_guides_for_this_issue,
+      voterGuidesForThisIssue,
     });
   }
 
@@ -51,20 +51,14 @@ export default class IssueTinyDisplay extends Component {
   }
 
   onIssueStoreChange () {
-    const voter_guides_for_this_issue = IssueStore.getVoterGuidesForOneIssue(this.state.issue_we_vote_id);
-    // console.log("IssueTinyDisplay, onIssueStoreChange, voter_guides_for_this_issue: ", voter_guides_for_this_issue);
-    this.setState({
-      voter_guides_for_this_issue,
-    });
+    // console.log("IssueTinyDisplay, onIssueStoreChange, voterGuidesForThisIssue: ", voterGuidesForThisIssue);
+    this.setState(prevState => ({ voterGuidesForThisIssue: IssueStore.getVoterGuidesForOneIssue(prevState.issue_we_vote_id) }));
   }
 
   onVoterGuideStoreChange () {
     // We just want to trigger a re-render
-    const voter_guides_for_this_issue = IssueStore.getVoterGuidesForOneIssue(this.state.issue_we_vote_id);
-    // console.log("IssueTinyDisplay, onVoterGuideStoreChange, voter_guides_for_this_issue: ", voter_guides_for_this_issue);
-    this.setState({
-      voter_guides_for_this_issue,
-    });
+    // console.log("IssueTinyDisplay, onVoterGuideStoreChange, voterGuidesForThisIssue: ", voterGuidesForThisIssue);
+    this.setState(prevState => ({ voterGuidesForThisIssue: IssueStore.getVoterGuidesForOneIssue(prevState.issue_we_vote_id) }));
   }
 
   onTriggerEnter (issueWeVoteId) {
@@ -124,29 +118,29 @@ export default class IssueTinyDisplay extends Component {
   render () {
     // console.log("IssueTinyDisplay");
     renderLog(__filename);
-    // console.log("IssueTinyDisplay render, issue_we_vote_id: ", this.state.issue_we_vote_id, ", this.state.voter_guides_for_this_issue: ", this.state.voter_guides_for_this_issue);
-    if (!this.state.voter_guides_for_this_issue || !this.state.voter_guides_for_this_issue.length) {
+    // console.log("IssueTinyDisplay render, issue_we_vote_id: ", this.state.issue_we_vote_id, ", this.state.voterGuidesForThisIssue: ", this.state.voterGuidesForThisIssue);
+    if (!this.state.voterGuidesForThisIssue || !this.state.voterGuidesForThisIssue.length) {
       return null;
     }
 
-    const organizations_not_shown_display = this.state.voter_guides_for_this_issue.map( (one_voter_guide) => {
-      // console.log("one_voter_guide: ", one_voter_guide);
-      const organization_we_vote_id = one_voter_guide.organization_we_vote_id;
-      const organization_name = one_voter_guide.voter_guide_display_name;
-      const organization_photo_url_tiny = one_voter_guide.voter_guide_image_url_tiny;
+    const organizationsNotShownDisplay = this.state.voterGuidesForThisIssue.map((oneVoterGuide) => {
+      // console.log("oneVoterGuide: ", oneVoterGuide);
+      const organizationWeVoteId = oneVoterGuide.organization_we_vote_id;
+      const organizationName = oneVoterGuide.voter_guide_display_name;
+      const organizationPhotoURLTiny = oneVoterGuide.voter_guide_image_url_tiny;
 
-      const num_of_lines = 2;
-      const twitterDescription = one_voter_guide.twitter_description ? one_voter_guide.twitter_description : "";
-      // If the organization_name is in the twitter_description, remove it
-      const twitterDescriptionMinusName = removeTwitterNameFromDescription(organization_name, twitterDescription);
+      const numOfLines = 2;
+      const twitterDescription = oneVoterGuide.twitter_description ? oneVoterGuide.twitter_description : "";
+      // If the organizationName is in the twitter_description, remove it
+      const twitterDescriptionMinusName = removeTwitterNameFromDescription(organizationName, twitterDescription);
 
       // If the displayName is in the twitterDescription, remove it from twitterDescription
-      const organizationDisplayName = organization_name || "";
+      const organizationDisplayName = organizationName || "";
       return (
-        <div key={organization_we_vote_id} className="card-main__media-object u-stack--md">
+        <div key={organizationWeVoteId} className="card-main__media-object u-stack--md">
           <div className="card-main__media-object-anchor">
             <ImageHandler
-              imageUrl={organization_photo_url_tiny}
+              imageUrl={organizationPhotoURLTiny}
               className=""
               sizeClassName="organization__image--tiny"
             />
@@ -154,7 +148,7 @@ export default class IssueTinyDisplay extends Component {
           &nbsp;&nbsp;
           <div className="card-main__media-object-content">
             <h3 className="card-main__display-name">{organizationDisplayName}</h3>
-            { twitterDescriptionMinusName ? <ReadMore text_to_display={twitterDescriptionMinusName} num_of_lines={num_of_lines} /> :
+            { twitterDescriptionMinusName ? <ReadMore text_to_display={twitterDescriptionMinusName} num_of_lines={numOfLines} /> :
               null}
           </div>
           <div className="card-child__additional">
@@ -162,7 +156,7 @@ export default class IssueTinyDisplay extends Component {
               <FollowToggle
                 currentBallotIdInUrl={this.props.currentBallotIdInUrl}
                 ballotItemWeVoteId={this.props.ballotItemWeVoteId}
-                organizationWeVoteId={organization_we_vote_id}
+                organizationWeVoteId={organizationWeVoteId}
                 urlWithoutHash={this.props.urlWithoutHash}
               />
             </div>
@@ -195,7 +189,7 @@ export default class IssueTinyDisplay extends Component {
           urlWithoutHash={this.props.urlWithoutHash}
         />
         <span className="guidelist card-child__list-group">
-          {organizations_not_shown_display}
+          {organizationsNotShownDisplay}
         </span>
       </Popover>
     );
