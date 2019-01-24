@@ -13,6 +13,7 @@
   "extends": "airbnb",
 
   "rules": {
+    "linebreak-style": ["error", "windows"], // Jan 2019 eslint fix for windows do not commit
     "array-bracket-spacing": [1, "never"],
     "camelcase": [1],
     "class-methods-use-this": 1,
@@ -52,6 +53,8 @@
     "react/destructuring-assignment": 0,          // Dec 2018: We should do this!  But right now we have 3990 warnings/errors if enabled.
     "react/forbid-prop-types": 0,                 // Dec 2018: Should consider someday
     "react/indent-prop": 0,
+    "react/jsx-one-expression-per-line": 0,       // Jan 2019 eslint fix for windows do not commit!
+    "react/jsx-wrap-multilines": 0,               // Jan 2019 eslint fix for windows do not commit!
     "react/jsx-first-prop-new-line": 0,
     "react/jsx-indent-props": 0,
     "react/jsx-no-bind": 1,                       // Dec 2018: Should these be errors?
